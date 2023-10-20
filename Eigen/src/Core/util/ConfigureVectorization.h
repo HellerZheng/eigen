@@ -3,6 +3,7 @@
 //
 // Copyright (C) 2008-2018 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2020, Arm Limited and Contributors
+// Copyright (C) 2023, Microchip Technology Inc
 //
 // This Source Code Form is subject to the terms of the Mozilla
 // Public License v. 2.0. If a copy of the MPL was not distributed
@@ -396,6 +397,19 @@
 #error "Eigen requires a fixed SVE lector length but EIGEN_ARM64_SVE_VL is not set."
 #endif
 
+    // RISCV Vector support
+  #elif (defined __riscv)
+    #if defined __RISCV_V_VECTOR_BITS_MIN
+    // Since we depend on knowing RVV vector lengths at compile-time, we need
+    // to ensure a fixed lengths is set
+
+        #define EIGEN_VECTORIZE
+        #define EIGEN_VECTORIZE_RVV
+        #include <riscv_vector.h>
+
+        #define EIGEN_RISCV_RVV_VL __RISCV_V_VECTOR_BITS_MIN
+    #endif
+
 #elif (defined __s390x__ && defined __VEC__)
 
 #define EIGEN_VECTORIZE
@@ -492,6 +506,8 @@ inline static const char *SimdInstructionSetsInUse(void) {
   return "ARM NEON";
 #elif defined(EIGEN_VECTORIZE_SVE)
   return "ARM SVE";
+#elif defined(EIGEN_VECTORIZE_RVV)
+  return "RISCV RVV";
 #elif defined(EIGEN_VECTORIZE_ZVECTOR)
   return "S390X ZVECTOR";
 #elif defined(EIGEN_VECTORIZE_MSA)

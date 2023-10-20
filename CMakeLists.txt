@@ -338,6 +338,13 @@ if(NOT MSVC)
     message(STATUS "Enabling S390X(zEC13) ZVECTOR in tests/examples")
   endif()
 
+  option(EIGEN_TEST_RVV "Enable/Disable riscv vector in tests/examples" ON)
+  if(EIGEN_TEST_RVV)
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__RISCV_V_VECTOR_BITS_MIN=512 -target riscv64-linux-gnu -march=rv64imafdcvh_zve64x_zve32f -mabi=lp64d -mrvv-vector-bits=512")
+    SET (CMAKE_CXX_LINK_FLAGS "-lm -lpthread  -lstdc++")
+    message(STATUS "Enabling RVV in tests/examples")
+  endif()
+
   check_cxx_compiler_flag("-fopenmp" COMPILER_SUPPORT_OPENMP)
   if(COMPILER_SUPPORT_OPENMP)
     option(EIGEN_TEST_OPENMP "Enable/Disable OpenMP in tests/examples" OFF)
